@@ -21,6 +21,7 @@ class Config:
     x_auth_token: str = ""
     minimum_post_likes: int = 0
     minimum_post_views: int = 0
+    max_post_age_hours: int = 24
     proxy_list: list[str] = field(default_factory=list)
     csv_export_path: str = "exports/leads.csv"
     db_path: str = "data/xscrapper.db"

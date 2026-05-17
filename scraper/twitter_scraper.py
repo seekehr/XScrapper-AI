@@ -4,6 +4,7 @@ import asyncio
 import random
 import re
 from dataclasses import dataclass, field
+from datetime import datetime, timezone, timedelta
 from typing import Any
 from urllib.parse import quote_plus
 
@@ -156,6 +157,14 @@ class TwitterScraper:
                         continue
                     if tweet.views < self.config.minimum_post_views:
                         continue
+                    if self.config.max_post_age_hours > 0 and tweet.timestamp:
+                        try:
+                            post_time = datetime.fromisoformat(tweet.timestamp.replace("Z", "+00:00"))
+                            cutoff = datetime.now(timezone.utc) - timedelta(hours=self.config.max_post_age_hours)
+                            if post_time < cutoff:
+                                continue
+                        except ValueError:
+                            pass
                     seen_ids.add(tweet.tweet_id)
                     tweets.append(tweet)
 
