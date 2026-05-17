@@ -1,10 +1,8 @@
 {
   "keywords": [
     "looking for developer",
-    "need AI automation",
-    "hiring full stack engineer",
-    "need chatbot",
-    "need SaaS developer"
+    "startup",
+    "need developer"
   ],
   "scrape_limit_per_keyword": 30,
   "batch_size": 15,
@@ -12,6 +10,7 @@
   "poll_interval_seconds": 300,
   "minimum_post_likes": 0,
   "minimum_post_views": 0,
+  "max_post_age_hours": 24,
   "proxy_list": [],
   "csv_export_path": "exports/leads.csv",
   "db_path": "data/xscrapper.db",
