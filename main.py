@@ -14,6 +14,7 @@ from utils.config import Config
 from utils.csv_export import CSVExporter
 from utils.database import Database
 from utils.logger import setup_logger
+from utils.tweet_store import TweetStore
 
 logger = setup_logger("xscrapper")
 
@@ -22,7 +23,8 @@ class XScrapperAI:
     def __init__(self, config: Config) -> None:
         self.config = config
         self.db = Database(config.db_path)
-        self.scraper = TwitterScraper(config, self.db)
+        self.tweet_store = TweetStore("data/tweets.json")
+        self.scraper = TwitterScraper(config, self.db, self.tweet_store)
         self.ai = GeminiFilter(config)
         self.webhook = DiscordWebhook(config, self.db)
         self.csv = CSVExporter(config.csv_export_path)
@@ -37,6 +39,8 @@ class XScrapperAI:
             return
 
         tweet_dicts = [t.to_dict() for t in tweets]
+        self.tweet_store.add(tweet_dicts)
+        logger.info("Tweet store now holds %d total tweets", self.tweet_store.total)
         logger.info("Analyzing %d tweets with Gemini...", len(tweet_dicts))
 
         decisions = await self.ai.analyze_all(tweet_dicts)

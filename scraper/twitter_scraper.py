@@ -13,6 +13,7 @@ from playwright.async_api import Browser, BrowserContext, Page, async_playwright
 from utils.config import Config
 from utils.database import Database
 from utils.logger import setup_logger
+from utils.tweet_store import TweetStore
 
 logger = setup_logger("xscrapper.scraper")
 
@@ -64,9 +65,10 @@ def _parse_metric(text: str) -> int:
 
 
 class TwitterScraper:
-    def __init__(self, config: Config, db: Database) -> None:
+    def __init__(self, config: Config, db: Database, tweet_store: TweetStore | None = None) -> None:
         self.config = config
         self.db = db
+        self._tweet_store = tweet_store
         self._browser: Browser | None = None
         self._context: BrowserContext | None = None
         self._proxy_index = 0
@@ -152,6 +154,8 @@ class TwitterScraper:
                     if tweet.tweet_id in seen_ids:
                         continue
                     if await self.db.is_tweet_processed(tweet.tweet_id):
+                        continue
+                    if self._tweet_store and self._tweet_store.contains(tweet.tweet_id):
                         continue
                     if tweet.likes < self.config.minimum_post_likes:
                         continue
